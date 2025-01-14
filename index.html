@@ -12,18 +12,12 @@
     <div class="container mt-5">
         <div class="text-center">
             <h1>Búsqueda de Neumáticos</h1>
-            <p class="lead">Selecciona el archivo Excel con la lista de neumáticos y luego ingresa la medida que deseas buscar.</p>
+            <p class="lead">Ingresa la medida que deseas buscar.</p>
         </div>
 
-        <!-- Formulario para cargar archivo y búsqueda -->
+        <!-- Formulario para ingresar la medida del neumático -->
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <!-- Input para cargar archivo Excel -->
-                <div class="form-group">
-                    <label for="fileInput">Selecciona el archivo Excel:</label>
-                    <input type="file" id="fileInput" class="form-control-file" accept=".xlsx, .xls">
-                </div>
-
                 <!-- Input para ingresar la medida del neumático -->
                 <div class="form-group">
                     <label for="medidaInput">Introduce la medida del neumático buscado y presiona Enter:</label>
@@ -37,6 +31,9 @@
 
         <!-- Contenedor para mostrar los resultados -->
         <div id="resultados" class="mt-4"></div>
+
+        <!-- Botón para copiar resultados al portapapeles -->
+        <button id="copyButton" class="btn btn-success btn-block mt-4" style="display:none;">Copiar resultados</button>
     </div>
 
     <!-- Incluir el JS de Bootstrap -->
@@ -64,82 +61,78 @@
                 return;
             }
 
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
-            if (!file) {
-                alert("Por favor, selecciona un archivo Excel.");
-                return;
-            }
-
-            // Función para buscar neumáticos
-            BuscarNeumatico(medidaBuscada, file);
+            // Cargar el archivo Excel directamente desde los recursos estáticos
+            cargarArchivo(medidaBuscada);
         }
 
-        function BuscarNeumatico(medidaBuscada, file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const worksheet = workbook.Sheets["Hoja1"];
+        function cargarArchivo(medidaBuscada) {
+            fetch('files/LISTA GENERAL SAMCOR.xlsx')  // Ruta al archivo Excel con el nombre correcto
+                .then(response => response.arrayBuffer())  // Leer el archivo como array de bytes
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets["Hoja1"];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    // Generar todas las posibles variantes de la medida
+                    const variantes = GenerarVariantesMedida(medidaBuscada);
 
-                // Generar todas las posibles variantes de la medida
-                const variantes = GenerarVariantesMedida(medidaBuscada);
+                    // Filtrar filas que contengan alguna de las variantes, ignorando mayúsculas/minúsculas
+                    const resultados = jsonData.filter(row =>
+                        variantes.some(vari => row["MEDIDA"] && row["MEDIDA"].toString().toUpperCase().includes(vari.toUpperCase()))
+                    );
 
-                // Filtrar filas que contengan alguna de las variantes, ignorando mayúsculas/minúsculas
-                const resultados = jsonData.filter(row =>
-                    variantes.some(vari => row["MEDIDA"] && row["MEDIDA"].toString().toUpperCase().includes(vari.toUpperCase()))
-                );
+                    const resultadosDiv = document.getElementById('resultados');
+                    resultadosDiv.innerHTML = ''; // Limpiar resultados previos
 
-                const resultadosDiv = document.getElementById('resultados');
-                resultadosDiv.innerHTML = ''; // Limpiar resultados previos
+                    if (resultados.length > 0) {
+                        resultados.forEach(fila => {
+                            const medida = fila["MEDIDA"] || '';
+                            const marca = fila["MARCA"] || '';
+                            const modelo = fila["MODELO"] || '';
+                            const precioUnidad = fila["UNIDAD"] || '';
+                            const precioJuego = fila["X 4"] || '';
 
-                if (resultados.length > 0) {
-                    resultados.forEach(fila => {
-                        const medida = fila["MEDIDA"] || '';
-                        const marca = fila["MARCA"] || '';
-                        const modelo = fila["MODELO"] || '';
-                        const precioUnidad = fila["UNIDAD"] || '';
-                        const precioJuego = fila["X 4"] || '';
+                            // Función para formatear los precios con puntos
+                            function formatearPrecio(precio) {
+                                if (!precio) return '';
+                                return precio.toLocaleString('es-ES');  // Formatear el precio con puntos
+                            }
 
-                        // Función para formatear los precios con puntos
-                        function formatearPrecio(precio) {
-                            if (!precio) return '';
-                            return precio.toLocaleString('es-ES');  // Formatear el precio con puntos
-                        }
+                            const precioUnidadFormateado = formatearPrecio(precioUnidad);
+                            const precioJuegoFormateado = formatearPrecio(precioJuego);
 
-                        const precioUnidadFormateado = formatearPrecio(precioUnidad);
-                        const precioJuegoFormateado = formatearPrecio(precioJuego);
+                            let resultadoTexto = '';
 
-                        let resultadoTexto = '';
+                            if (precioJuego && precioUnidad) {
+                                resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidadFormateado} cada uno y a $${precioJuegoFormateado} el juego.`;
+                            } else if (precioJuego) {
+                                resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioJuegoFormateado} el juego. NO se venden por unidad.`;
+                            } else if (precioUnidad) {
+                                resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidadFormateado} cada uno. NO se hace precio por los 4.`;
+                            }
 
-                        if (precioJuego && precioUnidad) {
-                            resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidadFormateado} cada uno y a $${precioJuegoFormateado} el juego.`;
-                        } else if (precioJuego) {
-                            resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioJuegoFormateado} el juego. NO se venden por unidad.`;
-                        } else if (precioUnidad) {
-                            resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidadFormateado} cada uno. NO se hace precio por los 4.`;
-                        }
+                            const resultadoElemento = document.createElement('p');
+                            resultadoElemento.classList.add('alert', 'alert-info');
+                            resultadoElemento.textContent = resultadoTexto;
+                            resultadosDiv.appendChild(resultadoElemento);
+                        });
 
+                        // Mostrar el botón para copiar
+                        document.getElementById('copyButton').style.display = 'block';
+                    } else {
                         const resultadoElemento = document.createElement('p');
-                        resultadoElemento.classList.add('alert', 'alert-info');
-                        resultadoElemento.textContent = resultadoTexto;
+                        resultadoElemento.classList.add('alert', 'alert-warning');
+                        resultadoElemento.textContent = `No se encontraron neumáticos que contengan la medida "${medidaBuscada}".`;
                         resultadosDiv.appendChild(resultadoElemento);
-                    });
-                } else {
-                    const resultadoElemento = document.createElement('p');
-                    resultadoElemento.classList.add('alert', 'alert-warning');
-                    resultadoElemento.textContent = `No se encontraron neumáticos que contengan la medida "${medidaBuscada}".`;
-                    resultadosDiv.appendChild(resultadoElemento);
-                }
-            };
 
-            reader.readAsArrayBuffer(file);
+                        // Ocultar el botón de copiar si no hay resultados
+                        document.getElementById('copyButton').style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error al cargar el archivo:', error));
         }
 
         function GenerarVariantesMedida(medida) {
-            // Asegurarnos de que la medida se trate como texto
             medida = medida.toString().trim();
 
             // Si la medida tiene 7 caracteres, convertirla a formato "XXX/XXRXX" y añadir variantes
@@ -183,6 +176,16 @@
             // Por defecto, devolver la medida como está
             return [medida];
         }
+
+        // Evento para copiar el contenido de los resultados
+        document.getElementById('copyButton').addEventListener('click', function() {
+            const resultadosDiv = document.getElementById('resultados');
+            const resultadosTexto = resultadosDiv.innerText;  // Obtener el texto de los resultados
+
+            navigator.clipboard.writeText(resultadosTexto)
+                .then(() => alert('Resultados copiados al portapapeles'))
+                .catch(err => console.error('Error al copiar: ', err));
+        });
     </script>
 </body>
 </html>
