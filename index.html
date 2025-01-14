@@ -183,8 +183,6 @@
             const resultadosTexto = resultadosDiv.innerText;  // Obtener el texto de los resultados
 
             navigator.clipboard.writeText(resultadosTexto)
-                .then(() => alert('Resultados copiados al portapapeles'))
-                .catch(err => console.error('Error al copiar: ', err));
         });
     </script>
 </body>
