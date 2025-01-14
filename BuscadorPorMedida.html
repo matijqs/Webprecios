@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búsqueda de Neumáticos</title>
+    <!-- Incluir el CSS de Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="text-center">
+            <h1>Búsqueda de Neumáticos</h1>
+            <p class="lead">Selecciona el archivo Excel con la lista de neumáticos y luego ingresa la medida que deseas buscar.</p>
+        </div>
+
+        <!-- Formulario para cargar archivo y búsqueda -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Input para cargar archivo Excel -->
+                <div class="form-group">
+                    <label for="fileInput">Selecciona el archivo Excel:</label>
+                    <input type="file" id="fileInput" class="form-control-file" accept=".xlsx, .xls">
+                </div>
+
+                <!-- Input para ingresar la medida del neumático -->
+                <div class="form-group">
+                    <label for="medidaInput">Introduce la medida del neumático:</label>
+                    <input type="text" id="medidaInput" class="form-control" placeholder="Ejemplo: 1457012">
+                </div>
+
+                <!-- Botón de búsqueda -->
+                <button style="background-color: red;" id="searchButton" class="btn btn-primary btn-block">Buscar</button>
+            </div>
+        </div>
+
+        <!-- Contenedor para mostrar los resultados -->
+        <div id="resultados" class="mt-4"></div>
+    </div>
+
+    <!-- Incluir el JS de Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.getElementById('searchButton').addEventListener('click', realizarBusqueda);
+
+        function realizarBusqueda() {
+            const medidaBuscada = document.getElementById('medidaInput').value.trim();
+
+            if (!medidaBuscada) {
+                alert("Por favor, ingresa una medida válida.");
+                return;
+            }
+
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Por favor, selecciona un archivo Excel.");
+                return;
+            }
+
+            // Función para buscar neumáticos
+            BuscarNeumatico(medidaBuscada, file);
+        }
+
+        function BuscarNeumatico(medidaBuscada, file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets["Hoja1"];
+
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                // Generar todas las posibles variantes de la medida
+                const variantes = GenerarVariantesMedida(medidaBuscada);
+
+                // Filtrar filas que contengan alguna de las variantes, ignorando mayúsculas/minúsculas
+                const resultados = jsonData.filter(row =>
+                    variantes.some(vari => row["MEDIDA"] && row["MEDIDA"].toString().toUpperCase().includes(vari.toUpperCase()))
+                );
+
+                const resultadosDiv = document.getElementById('resultados');
+                resultadosDiv.innerHTML = ''; // Limpiar resultados previos
+
+                if (resultados.length > 0) {
+                    resultados.forEach(fila => {
+                        const medida = fila["MEDIDA"] || '';
+                        const marca = fila["MARCA"] || '';
+                        const modelo = fila["MODELO"] || '';
+                        const precioUnidad = fila["UNIDAD"] || '';
+                        const precioJuego = fila["X 4"] || '';
+
+                        // Función para formatear los precios con puntos
+                        function formatearPrecio(precio) {
+                            if (!precio) return '';
+                            return precio.toLocaleString('es-ES');  // Formatear el precio con puntos
+                        }
+
+                        const precioUnidadFormateado = formatearPrecio(precioUnidad);
+                        const precioJuegoFormateado = formatearPrecio(precioJuego);
+
+                        let resultadoTexto = '';
+
+                        if (precioJuego && precioUnidad) {
+                            resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidadFormateado} cada uno y a $${precioJuegoFormateado} el juego.`;
+                        } else if (precioJuego) {
+                            resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioJuegoFormateado} el juego. NO se venden por unidad.`;
+                        } else if (precioUnidad) {
+                            resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidadFormateado} cada uno. NO se hace precio por los 4.`;
+                        }
+
+                        const resultadoElemento = document.createElement('p');
+                        resultadoElemento.classList.add('alert', 'alert-info');
+                        resultadoElemento.textContent = resultadoTexto;
+                        resultadosDiv.appendChild(resultadoElemento);
+                    });
+                } else {
+                    const resultadoElemento = document.createElement('p');
+                    resultadoElemento.classList.add('alert', 'alert-warning');
+                    resultadoElemento.textContent = `No se encontraron neumáticos que contengan la medida "${medidaBuscada}".`;
+                    resultadosDiv.appendChild(resultadoElemento);
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function GenerarVariantesMedida(medida) {
+            // Asegurarnos de que la medida se trate como texto
+            medida = medida.toString().trim();
+
+            // Si la medida tiene 7 caracteres, convertirla a formato "XXX/XXRXX" y añadir variantes
+            if (medida.length === 7) {
+                const ancho = medida.substring(0, 3);        // Primeros 3 caracteres
+                const perfil = medida.substring(3, 5);       // Caracteres del 3 al 5 (2 dígitos)
+                const diametro = medida.substring(5);        // Últimos 2 caracteres
+
+                return [
+                    `${ancho}/${perfil}R${diametro}`,           // Formato estándar
+                    `${ancho}/${perfil}ZR${diametro}`,          // Variante ZR
+                    `${ancho}/${perfil}ZRZ${diametro}`,         // Variante ZRZ
+                    `${ancho}/${perfil}RZR${diametro}`,         // Variante RZR
+                    `${ancho}/${perfil}R${diametro}C`,          // Variante con C
+                    `${ancho}/${perfil}ZR${diametro}C`,         // Variante ZR con C
+                    `${ancho}/${perfil}ZRF${diametro}`,         // Variante ZRF
+                    `${ancho}/${perfil}ZRXL${diametro}`,        // Variante ZRXL
+                    `${ancho}/${perfil}ZRF${diametro}C`         // Variante ZRF con C
+                ];
+            }
+
+            // Si la medida tiene 5 caracteres, convertirla a formato "XXXRXX" y añadir variantes
+            if (medida.length === 5) {
+                const ancho = medida.substring(0, 3);        // Primeros 3 caracteres
+                const diametro = medida.substring(3);        // Últimos 2 caracteres
+
+                return [
+                    `${ancho}R${diametro}`,                    // Formato estándar
+                    `${ancho}R${diametro}C`,                   // Variante con C
+                    `${ancho}ZR${diametro}`,                   // Variante ZR
+                    `${ancho}ZR${diametro}C`,                  // Variante ZR con C
+                    `${ancho}ZRF${diametro}`                   // Variante ZRF
+                ];
+            }
+
+            // Si la medida ya contiene "/", "R" o "Z", devolverla directamente
+            if (medida.includes("/") || medida.includes("R") || medida.includes("Z")) {
+                return [medida];
+            }
+
+            // Por defecto, devolver la medida como está
+            return [medida];
+        }
+    </script>
+</body>
+</html>
