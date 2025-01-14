@@ -45,7 +45,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
+        // Agregar un evento para el botón
         document.getElementById('searchButton').addEventListener('click', realizarBusqueda);
+
+        // Agregar el evento de la tecla Enter
+        document.getElementById('medidaInput').addEventListener('keydown', function(event) {
+            // Si se presiona la tecla "Enter" (código de la tecla 13)
+            if (event.key === "Enter") {
+                realizarBusqueda();
+            }
+        });
 
         function realizarBusqueda() {
             const medidaBuscada = document.getElementById('medidaInput').value.trim();
