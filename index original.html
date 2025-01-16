@@ -18,29 +18,36 @@
         <!-- Formulario para ingresar la medida del neumático -->
         <div class="row justify-content-center">
             <div class="col-md-8">
+                <!-- Input para ingresar la medida del neumático -->
                 <div class="form-group">
                     <label for="medidaInput">Introduce la medida del neumático buscado y presiona Enter:</label>
                     <input type="text" id="medidaInput" class="form-control" placeholder="Ejemplo: 1457012">
                 </div>
+
+                <!-- Botón de búsqueda -->
                 <button style="background-color: red;" id="searchButton" class="btn btn-primary btn-block">Buscar</button>
             </div>
         </div>
 
+        <!-- Contenedor para mostrar los resultados -->
         <div id="resultados" class="mt-4"></div>
+
+        <!-- Botón para copiar resultados al portapapeles -->
         <button id="copyButton" class="btn btn-success btn-block mt-4" style="display:none;">Copiar resultados</button>
-        <div id="topBusquedas" class="mt-4"></div>
     </div>
 
+    <!-- Incluir el JS de Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
-        // Inicializar las estadísticas desde localStorage o como un objeto vacío
-        const estadisticas = JSON.parse(localStorage.getItem('estadisticas')) || {};
-
+        // Agregar un evento para el botón
         document.getElementById('searchButton').addEventListener('click', realizarBusqueda);
+
+        // Agregar el evento de la tecla Enter
         document.getElementById('medidaInput').addEventListener('keydown', function(event) {
+            // Si se presiona la tecla "Enter" (código de la tecla 13)
             if (event.key === "Enter") {
                 realizarBusqueda();
             }
@@ -54,39 +61,28 @@
                 return;
             }
 
-            // Actualizar estadísticas
-            if (estadisticas[medidaBuscada]) {
-                estadisticas[medidaBuscada]++;
-            } else {
-                estadisticas[medidaBuscada] = 1;
-            }
-
-            // Guardar estadísticas actualizadas en localStorage
-            localStorage.setItem('estadisticas', JSON.stringify(estadisticas));
-
-            // Actualizar la tabla de top búsquedas
-            actualizarTopBusquedas();
-
-            // Cargar el archivo Excel para buscar resultados
+            // Cargar el archivo Excel directamente desde los recursos estáticos
             cargarArchivo(medidaBuscada);
         }
 
         function cargarArchivo(medidaBuscada) {
-            fetch('files/LISTA GENERAL SAMCOR.xlsx')
-                .then(response => response.arrayBuffer())
+            fetch('files/LISTA GENERAL SAMCOR.xlsx')  // Ruta al archivo Excel con el nombre correcto
+                .then(response => response.arrayBuffer())  // Leer el archivo como array de bytes
                 .then(data => {
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets["Hoja1"];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
+                    // Generar todas las posibles variantes de la medida
                     const variantes = GenerarVariantesMedida(medidaBuscada);
 
+                    // Filtrar filas que contengan alguna de las variantes, ignorando mayúsculas/minúsculas
                     const resultados = jsonData.filter(row =>
                         variantes.some(vari => row["MEDIDA"] && row["MEDIDA"].toString().toUpperCase().includes(vari.toUpperCase()))
                     );
 
                     const resultadosDiv = document.getElementById('resultados');
-                    resultadosDiv.innerHTML = '';
+                    resultadosDiv.innerHTML = ''; // Limpiar resultados previos
 
                     if (resultados.length > 0) {
                         resultados.forEach(fila => {
@@ -96,12 +92,32 @@
                             const precioUnidad = fila["UNIDAD"] || '';
                             const precioJuego = fila["X 4"] || '';
 
+                            // Función para formatear los precios con puntos
+                            function formatearPrecio(precio) {
+                                if (!precio) return '';
+                                return precio.toLocaleString('es-ES');  // Formatear el precio con puntos
+                            }
+
+                            const precioUnidadFormateado = formatearPrecio(precioUnidad);
+                            const precioJuegoFormateado = formatearPrecio(precioJuego);
+
+                            let resultadoTexto = '';
+
+                            if (precioJuego && precioUnidad) {
+                                resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidadFormateado} cada uno y a $${precioJuegoFormateado} el juego.`;
+                            } else if (precioJuego) {
+                                resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioJuegoFormateado} el juego. NO se venden por unidad.`;
+                            } else if (precioUnidad) {
+                                resultadoTexto = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidadFormateado} cada uno. NO se hace precio por los 4.`;
+                            }
+
                             const resultadoElemento = document.createElement('p');
                             resultadoElemento.classList.add('alert', 'alert-info');
-                            resultadoElemento.textContent = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidad} cada uno y a $${precioJuego} el juego.`;
+                            resultadoElemento.textContent = resultadoTexto;
                             resultadosDiv.appendChild(resultadoElemento);
                         });
 
+                        // Mostrar el botón para copiar
                         document.getElementById('copyButton').style.display = 'block';
                     } else {
                         const resultadoElemento = document.createElement('p');
@@ -109,6 +125,7 @@
                         resultadoElemento.textContent = `No se encontraron neumáticos que contengan la medida "${medidaBuscada}".`;
                         resultadosDiv.appendChild(resultadoElemento);
 
+                        // Ocultar el botón de copiar si no hay resultados
                         document.getElementById('copyButton').style.display = 'none';
                     }
                 })
@@ -160,43 +177,13 @@
             return [medida];
         }
 
-        function actualizarTopBusquedas() {
-            const topBusquedasDiv = document.getElementById('topBusquedas');
-            const topBusquedas = Object.entries(estadisticas)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
+        // Evento para copiar el contenido de los resultados
+        document.getElementById('copyButton').addEventListener('click', function() {
+            const resultadosDiv = document.getElementById('resultados');
+            const resultadosTexto = resultadosDiv.innerText;  // Obtener el texto de los resultados
 
-            let tablaHTML = `
-                <h3>Top 10 medidas más buscadas</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Medida</th>
-                            <th>Consultas</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            topBusquedas.forEach(([medida, cantidad]) => {
-                tablaHTML += `
-                    <tr>
-                        <td>${medida}</td>
-                        <td>${cantidad}</td>
-                    </tr>
-                `;
-            });
-
-            tablaHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            topBusquedasDiv.innerHTML = tablaHTML;
-        }
-
-        // Cargar la tabla de top búsquedas al cargar la página
-        actualizarTopBusquedas();
+            navigator.clipboard.writeText(resultadosTexto)
+        });
     </script>
 </body>
 </html>
