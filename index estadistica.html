@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búsqueda de Neumáticos</title>
+    <!-- Incluir el CSS de Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="text-center">
+            <h1>Búsqueda de Neumáticos</h1>
+            <p class="lead">Ingresa la medida que deseas buscar.</p>
+        </div>
+
+        <!-- Formulario para ingresar la medida del neumático -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="medidaInput">Introduce la medida del neumático buscado y presiona Enter:</label>
+                    <input type="text" id="medidaInput" class="form-control" placeholder="Ejemplo: 1457012">
+                </div>
+                <button style="background-color: red;" id="searchButton" class="btn btn-primary btn-block">Buscar</button>
+            </div>
+        </div>
+
+        <div id="resultados" class="mt-4"></div>
+        <button id="copyButton" class="btn btn-success btn-block mt-4" style="display:none;">Copiar resultados</button>
+        <div id="topBusquedas" class="mt-4"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Inicializar las estadísticas desde localStorage o como un objeto vacío
+        const estadisticas = JSON.parse(localStorage.getItem('estadisticas')) || {};
+
+        document.getElementById('searchButton').addEventListener('click', realizarBusqueda);
+        document.getElementById('medidaInput').addEventListener('keydown', function(event) {
+            if (event.key === "Enter") {
+                realizarBusqueda();
+            }
+        });
+
+        function realizarBusqueda() {
+            const medidaBuscada = document.getElementById('medidaInput').value.trim();
+
+            if (!medidaBuscada) {
+                alert("Por favor, ingresa una medida válida.");
+                return;
+            }
+
+            // Actualizar estadísticas
+            if (estadisticas[medidaBuscada]) {
+                estadisticas[medidaBuscada]++;
+            } else {
+                estadisticas[medidaBuscada] = 1;
+            }
+
+            // Guardar estadísticas actualizadas en localStorage
+            localStorage.setItem('estadisticas', JSON.stringify(estadisticas));
+
+            // Actualizar la tabla de top búsquedas
+            actualizarTopBusquedas();
+
+            // Cargar el archivo Excel para buscar resultados
+            cargarArchivo(medidaBuscada);
+        }
+
+        function cargarArchivo(medidaBuscada) {
+            fetch('files/LISTA GENERAL SAMCOR.xlsx')
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets["Hoja1"];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    const variantes = GenerarVariantesMedida(medidaBuscada);
+
+                    const resultados = jsonData.filter(row =>
+                        variantes.some(vari => row["MEDIDA"] && row["MEDIDA"].toString().toUpperCase().includes(vari.toUpperCase()))
+                    );
+
+                    const resultadosDiv = document.getElementById('resultados');
+                    resultadosDiv.innerHTML = '';
+
+                    if (resultados.length > 0) {
+                        resultados.forEach(fila => {
+                            const medida = fila["MEDIDA"] || '';
+                            const marca = fila["MARCA"] || '';
+                            const modelo = fila["MODELO"] || '';
+                            const precioUnidad = fila["UNIDAD"] || '';
+                            const precioJuego = fila["X 4"] || '';
+
+                            const resultadoElemento = document.createElement('p');
+                            resultadoElemento.classList.add('alert', 'alert-info');
+                            resultadoElemento.textContent = `Tenemos la medida "${medida}" de marca "${marca}" modelo "${modelo}" a $${precioUnidad} cada uno y a $${precioJuego} el juego.`;
+                            resultadosDiv.appendChild(resultadoElemento);
+                        });
+
+                        document.getElementById('copyButton').style.display = 'block';
+                    } else {
+                        const resultadoElemento = document.createElement('p');
+                        resultadoElemento.classList.add('alert', 'alert-warning');
+                        resultadoElemento.textContent = `No se encontraron neumáticos que contengan la medida "${medidaBuscada}".`;
+                        resultadosDiv.appendChild(resultadoElemento);
+
+                        document.getElementById('copyButton').style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error al cargar el archivo:', error));
+        }
+
+        function GenerarVariantesMedida(medida) {
+            medida = medida.toString().trim();
+
+            // Si la medida tiene 7 caracteres, convertirla a formato "XXX/XXRXX" y añadir variantes
+            if (medida.length === 7) {
+                const ancho = medida.substring(0, 3);        // Primeros 3 caracteres
+                const perfil = medida.substring(3, 5);       // Caracteres del 3 al 5 (2 dígitos)
+                const diametro = medida.substring(5);        // Últimos 2 caracteres
+
+                return [
+                    `${ancho}/${perfil}R${diametro}`,           // Formato estándar
+                    `${ancho}/${perfil}ZR${diametro}`,          // Variante ZR
+                    `${ancho}/${perfil}ZRZ${diametro}`,         // Variante ZRZ
+                    `${ancho}/${perfil}RZR${diametro}`,         // Variante RZR
+                    `${ancho}/${perfil}R${diametro}C`,          // Variante con C
+                    `${ancho}/${perfil}ZR${diametro}C`,         // Variante ZR con C
+                    `${ancho}/${perfil}ZRF${diametro}`,         // Variante ZRF
+                    `${ancho}/${perfil}ZRXL${diametro}`,        // Variante ZRXL
+                    `${ancho}/${perfil}ZRF${diametro}C`         // Variante ZRF con C
+                ];
+            }
+
+            // Si la medida tiene 5 caracteres, convertirla a formato "XXXRXX" y añadir variantes
+            if (medida.length === 5) {
+                const ancho = medida.substring(0, 3);        // Primeros 3 caracteres
+                const diametro = medida.substring(3);        // Últimos 2 caracteres
+
+                return [
+                    `${ancho}R${diametro}`,                    // Formato estándar
+                    `${ancho}R${diametro}C`,                   // Variante con C
+                    `${ancho}ZR${diametro}`,                   // Variante ZR
+                    `${ancho}ZR${diametro}C`,                  // Variante ZR con C
+                    `${ancho}ZRF${diametro}`                   // Variante ZRF
+                ];
+            }
+
+            // Si la medida ya contiene "/", "R" o "Z", devolverla directamente
+            if (medida.includes("/") || medida.includes("R") || medida.includes("Z")) {
+                return [medida];
+            }
+
+            // Por defecto, devolver la medida como está
+            return [medida];
+        }
+
+        function actualizarTopBusquedas() {
+            const topBusquedasDiv = document.getElementById('topBusquedas');
+            const topBusquedas = Object.entries(estadisticas)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            let tablaHTML = `
+                <h3>Top 10 medidas más buscadas</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Medida</th>
+                            <th>Consultas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            topBusquedas.forEach(([medida, cantidad]) => {
+                tablaHTML += `
+                    <tr>
+                        <td>${medida}</td>
+                        <td>${cantidad}</td>
+                    </tr>
+                `;
+            });
+
+            tablaHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            topBusquedasDiv.innerHTML = tablaHTML;
+        }
+
+        // Cargar la tabla de top búsquedas al cargar la página
+        actualizarTopBusquedas();
+    </script>
+</body>
+</html>
