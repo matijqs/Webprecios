@@ -1,7 +1,15 @@
-// Agregar un evento para el botón
-document.getElementById('searchButton').addEventListener('click', realizarBusqueda);
+document.getElementById('themeSwitcher').addEventListener('change', function() {
+    // Cambiar el tema según el estado del interruptor
+    if (this.checked) {
+        document.body.classList.remove('light-theme');
+        document.body.classList.add('dark-theme');
+    } else {
+        document.body.classList.remove('dark-theme');
+        document.body.classList.add('light-theme');
+    }
+});
 
-// Agregar el evento de la tecla Enter
+document.getElementById('searchButton').addEventListener('click', realizarBusqueda);
 document.getElementById('medidaInput').addEventListener('keydown', function(event) {
     if (event.key === "Enter") {
         realizarBusqueda();
@@ -118,23 +126,19 @@ function GenerarVariantesMedida(medida) {
     return [medida];
 }
 
-// Evento para copiar el contenido de los resultados
 document.getElementById('copyButton').addEventListener('click', function() {
     const resultadosDiv = document.getElementById('resultados');
     let resultadosTexto = 'En la medida solicitada, tenemos lo siguiente:\n\n';
 
-    // Obtener todos los elementos de alerta dentro del contenedor de resultados
     const alertElements = resultadosDiv.getElementsByClassName('alert');
 
-    // Recorrer cada elemento de alerta y formatear el texto
     for (let i = 0; i < alertElements.length; i++) {
         const alertElement = alertElements[i];
         const lines = alertElement.innerText.split('\n').map(line => line.trim()).filter(line => line !== '');
         resultadosTexto += lines.join('\n') + '\n\n';
     }
 
-    // Limpiar los resultados para evitar espacios extra entre líneas
-    resultadosTexto = resultadosTexto.trim(); // Eliminar espacios adicionales al principio y al final
+    resultadosTexto = resultadosTexto.trim();
 
     navigator.clipboard.writeText(resultadosTexto);
 });

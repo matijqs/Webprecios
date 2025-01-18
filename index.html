@@ -6,14 +6,15 @@
     <title>Búsqueda de Neumáticos</title>
     <!-- Incluir el CSS de Bootstrap -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css"> <!-- Enlazar el archivo CSS -->
+    <link href="styles.css" rel="stylesheet"> <!-- Enlace al archivo CSS -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 </head>
 <body class="light-theme">
     <!-- Interruptor para cambiar de tema -->
     <div class="switch-button">
-        <input type="checkbox" id="switch-label" class="switch-button__checkbox">
-        <label for="switch-label" class="switch-button__label"></label>
+        <input type="checkbox" class="switch-button__checkbox" id="themeSwitcher">
+        <label class="switch-button__label" for="themeSwitcher"></label>
     </div>
 
     <div class="logo-container">
@@ -48,6 +49,8 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="script.js"></script> <!-- Enlazar el archivo JS -->
+
+    <!-- Enlace al archivo JS -->
+    <script src="script.js"></script>
 </body>
 </html>
