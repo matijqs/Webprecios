@@ -1,17 +1,8 @@
-document.getElementById('themeSwitcher').addEventListener('change', function() {
-    // Cambiar el tema según el estado del interruptor
-    if (this.checked) {
-        document.body.classList.remove('light-theme');
-        document.body.classList.add('dark-theme');
-    } else {
-        document.body.classList.remove('dark-theme');
-        document.body.classList.add('light-theme');
-    }
-});
-
 document.getElementById('searchButton').addEventListener('click', realizarBusqueda);
 document.getElementById('medidaInput').addEventListener('keydown', function(event) {
-    if (event.key === "Enter") {
+    
+    if (event.key === "Enter") {       
+
         realizarBusqueda();
     }
 });
@@ -45,7 +36,7 @@ function cargarArchivo(medidaBuscada) {
             resultadosDiv.innerHTML = '';
 
             const encabezado = document.createElement('h3');
-            encabezado.textContent = "En la medida solicitada, tenemos lo siguiente:";
+            encabezado.textContent = "Tenemos lo siguiente:";
             resultadosDiv.appendChild(encabezado);
 
             if (resultados.length > 0) {
@@ -154,19 +145,20 @@ function GenerarVariantesMedida(medida) {
     return [medida];
 }
 
-document.getElementById('copyButton').addEventListener('click', function() {
-    const resultadosDiv = document.getElementById('resultados');
-    let resultadosTexto = 'En la medida solicitada, tenemos lo siguiente:\n\n';
+    document.getElementById('copyButton').addEventListener('click', function() {
+        const resultadosDiv = document.getElementById('resultados');
+        let resultadosTexto = 'Tenemos lo siguiente:\n\n';
 
-    const alertElements = resultadosDiv.getElementsByClassName('alert');
+        const alertElements = resultadosDiv.getElementsByClassName('alert');
 
-    for (let i = 0; i < alertElements.length; i++) {
-        const alertElement = alertElements[i];
-        const lines = alertElement.innerText.split('\n').map(line => line.trim()).filter(line => line !== '');
-        resultadosTexto += lines.join('\n') + '\n\n';
-    }
+        for (let i = 0; i < alertElements.length; i++) {
+            const alertElement = alertElements[i];
+            const lines = alertElement.innerText.split('\n').map(line => line.trim()).filter(line => line !== '');
+            resultadosTexto += lines.join('\n') + '\n\n';
+        }
 
-    resultadosTexto = resultadosTexto.trim();
+        resultadosTexto = resultadosTexto.trim();
 
-    navigator.clipboard.writeText(resultadosTexto);
+        navigator.clipboard.writeText(resultadosTexto);   
+
 });

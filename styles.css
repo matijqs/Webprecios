@@ -1,29 +1,5 @@
-/* Estilos del tema claro */
-body.light-theme {
-    /*background-color: #fff;*/
-    /*background: linear-gradient(white,rgb(250, 95, 95));*/
-    background: linear-gradient(#333333,black);
-    color: #000;
-    font-family: Arial, sans-serif;
-    position: auto;
-}
 
-body.light-theme::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url('../files/Fondo.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0.7; 
-    z-index: -1; 
-}
-/* Estilos del tema oscuro */
-body.dark-theme {
+body {
     
     background: linear-gradient(#333333,black);
     color: #fff;
@@ -31,7 +7,7 @@ body.dark-theme {
     position: auto;
 }
 
-body.dark-theme::before {
+body::before {
     content: "";
     position: absolute;
     top: 0;
@@ -46,7 +22,6 @@ body.dark-theme::before {
     z-index: -1; /* Asegura que la imagen no cubra el contenido */
   }
 
-
 .logo-container {
     display: flex;
     justify-content: center;
@@ -59,22 +34,15 @@ body.dark-theme::before {
     height: auto;
     
 }
-body.light-theme .logo{
-    position: relative;
-    z-index: 1; /* Asegura que el logo esté por encima de la imagen */
-    background-color: rgba(196, 196, 196, 0.5); /* Fondo oscuro semi-transparente */
-    padding: 5px;
-    border-radius: 8px;
-    display: inline-block; /* Ajusta según sea necesario */
-}
 
-body.dark-theme .logo{
+body .logo{
     position: relative;
     z-index: 1; /* Asegura que el logo esté por encima de la imagen */
     background-color: rgba(110, 110, 110, 0.5); /* Fondo oscuro semi-transparente */
     padding: 5px;
     border-radius: 8px;
     display: inline-block; /* Ajusta según sea necesario */
+    box-shadow:0 0 15px rgba(0, 0, 0, 0.3);
 }
 
 .container {
@@ -84,13 +52,7 @@ body.dark-theme .logo{
     
 }
 
-/* Estilos para el contenedor en el tema claro */
-body.light-theme .container {
-    background: linear-gradient(white,rgb(250, 95, 95));
-}
-
-/* Estilos para el contenedor en el tema oscuro */
-body.dark-theme .container {
+body .container {
     background: linear-gradient(#333333,black);
 }
 
@@ -99,44 +61,19 @@ h1 {
     font-size: 2.5rem;
 }
 
-body.dark-theme .lead {
+body .lead {
     color: #b9b9b9;
     font-size: 1.2rem;
 }
 
-body.light-theme .lead {
-    color: #000000;
-    font-size: 1.2rem;
-}
-
-body.dark-theme .form-group label {
+body .form-group label {
     color: #b9b9b9;
 }
 
-body.light-theme .form-group label {
-    color: #000000;
-}
-
-body.dark-theme .form-control {
+body .form-control {
     background-color: #333333;
     color: #ffffff;
     border: 1px solid #ff0000;
-}
-
-body.light-theme .form-control {
-    display: block;
-    width: 100%;
-    height: calc(1.5em + .75rem + 2px);
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #495057;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
-    border-radius: .25rem;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 .form-control:focus {
@@ -156,13 +93,13 @@ body.light-theme .form-control {
 }
 
 .btn-success {
-    background-color: #4CAF50;
-    border-color: #4CAF50;
+    background-color: #ff0000;
+    border-color: #ff0000;
 }
 
 .btn-success:hover {
-    background-color: #45a049;
-    border-color: #45a049;
+    background-color: #cc0000;
+    border-color: #cc0000;
 }
 
 .alert {
@@ -171,16 +108,10 @@ body.light-theme .form-control {
     font-size: 1.1rem;
 }
 
-body.dark-theme .alert-info {
+body .alert-info {
     background-color: #333333;
     color: #ffffff;
     border-left: 5px solid #ff0000;
-}
-
-body.light-theme .alert-info {
-    color: #0c5460;
-    background-color: #d1ecf1;
-    border-color: #bee5eb;
 }
 
 .alert-warning {
@@ -191,44 +122,4 @@ body.light-theme .alert-info {
 
 .mt-4 {
     margin-top: 30px;
-}
-
-.switch-button {
-    display: inline-block;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-.switch-button .switch-button__checkbox {
-    display: none;
-}
-
-.switch-button .switch-button__label {
-    background-color: #000000;
-    width: 3rem;
-    height: 1.5rem;
-    border-radius: 1.5rem;
-    display: inline-block;
-    position: relative;
-}
-
-.switch-button .switch-button__label:before {
-    transition: .2s;
-    display: block;
-    position: absolute;
-    width: 1.5rem;
-    height: 1.5rem;
-    background-color: #fdffff;
-    content: '';
-    border-radius: 50%;
-    box-shadow: inset 0px 0px 0px 1px #000;
-}
-
-.switch-button .switch-button__checkbox:checked + .switch-button__label {
-    background-color: #f50707;
-}
-
-.switch-button .switch-button__checkbox:checked + .switch-button__label:before {
-    transform: translateX(1.5rem);
 }
