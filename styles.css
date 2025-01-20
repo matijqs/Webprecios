@@ -1,42 +1,97 @@
 /* Estilos del tema claro */
 body.light-theme {
-    background-color: #fff;
+    /*background-color: #fff;*/
+    /*background: linear-gradient(white,rgb(250, 95, 95));*/
+    background: linear-gradient(#333333,black);
     color: #000;
+    font-family: Arial, sans-serif;
+    position: auto;
 }
 
+body.light-theme::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../files/Fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.7; 
+    z-index: -1; 
+}
 /* Estilos del tema oscuro */
 body.dark-theme {
-    background-color: #121212;
+    
+    background: linear-gradient(#333333,black);
     color: #fff;
     font-family: Arial, sans-serif;
+    position: auto;
 }
+
+body.dark-theme::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../files/Fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.2; /* Imagen de fondo con 50% de transparencia */
+    z-index: -1; /* Asegura que la imagen no cubra el contenido */
+  }
+
 
 .logo-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 20px;    
 }
 
 .logo {
     max-width: 200px;
     height: auto;
+    
+}
+body.light-theme .logo{
+    position: relative;
+    z-index: 1; /* Asegura que el logo esté por encima de la imagen */
+    background-color: rgba(196, 196, 196, 0.5); /* Fondo oscuro semi-transparente */
+    padding: 5px;
+    border-radius: 8px;
+    display: inline-block; /* Ajusta según sea necesario */
+}
+
+body.dark-theme .logo{
+    position: relative;
+    z-index: 1; /* Asegura que el logo esté por encima de la imagen */
+    background-color: rgba(110, 110, 110, 0.5); /* Fondo oscuro semi-transparente */
+    padding: 5px;
+    border-radius: 8px;
+    display: inline-block; /* Ajusta según sea necesario */
 }
 
 .container {
     padding: 40px;
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    
 }
 
 /* Estilos para el contenedor en el tema claro */
 body.light-theme .container {
-    background-color: #f9f9f9;
+    background: linear-gradient(white,rgb(250, 95, 95));
 }
 
 /* Estilos para el contenedor en el tema oscuro */
 body.dark-theme .container {
-    background-color: #1c1c1c;
+    background: linear-gradient(#333333,black);
 }
 
 h1 {
@@ -45,7 +100,7 @@ h1 {
 }
 
 body.dark-theme .lead {
-    color: #333333;
+    color: #b9b9b9;
     font-size: 1.2rem;
 }
 
@@ -55,7 +110,7 @@ body.light-theme .lead {
 }
 
 body.dark-theme .form-group label {
-    color: #333333;
+    color: #b9b9b9;
 }
 
 body.light-theme .form-group label {

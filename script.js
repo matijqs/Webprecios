@@ -109,20 +109,48 @@ function cargarArchivo(medidaBuscada) {
 }
 
 function GenerarVariantesMedida(medida) {
+    // Asegurarnos de que la medida se trate como texto
     medida = medida.toString().trim();
+
+    // Si la medida tiene 7 caracteres, convertirla a formato "XXX/XXRXX" y añadir variantes
     if (medida.length === 7) {
-        const ancho = medida.substring(0, 3);
-        const perfil = medida.substring(3, 5);
-        const diametro = medida.substring(5);
+        const ancho = medida.substring(0, 3);        // Primeros 3 caracteres
+        const perfil = medida.substring(3, 5);       // Caracteres del 3 al 5 (2 dígitos)
+        const diametro = medida.substring(5);        // Últimos 2 caracteres
+
         return [
-            `${ancho}/${perfil}R${diametro}`, `${ancho}/${perfil}ZR${diametro}`, `${ancho}/${perfil}RZR${diametro}`, `${ancho}/${perfil}R${diametro}C`
+            `${ancho}/${perfil}R${diametro}`,           // Formato estándar
+            `${ancho}/${perfil}ZR${diametro}`,          // Variante ZR
+            `${ancho}/${perfil}ZRZ${diametro}`,         // Variante ZRZ
+            `${ancho}/${perfil}RZR${diametro}`,         // Variante RZR
+            `${ancho}/${perfil}R${diametro}C`,          // Variante con C
+            `${ancho}/${perfil}ZR${diametro}C`,         // Variante ZR con C
+            `${ancho}/${perfil}ZRF${diametro}`,         // Variante ZRF
+            `${ancho}/${perfil}ZRXL${diametro}`,        // Variante ZRXL
+            `${ancho}/${perfil}ZRF${diametro}C`         // Variante ZRF con C
         ];
     }
+
+    // Si la medida tiene 5 caracteres, convertirla a formato "XXXRXX" y añadir variantes
     if (medida.length === 5) {
-        const ancho = medida.substring(0, 3);
-        const diametro = medida.substring(3);
-        return [`${ancho}R${diametro}`, `${ancho}ZR${diametro}`];
+        const ancho = medida.substring(0, 3);        // Primeros 3 caracteres
+        const diametro = medida.substring(3);        // Últimos 2 caracteres
+
+        return [
+            `${ancho}R${diametro}`,                    // Formato estándar
+            `${ancho}R${diametro}C`,                   // Variante con C
+            `${ancho}ZR${diametro}`,                   // Variante ZR
+            `${ancho}ZR${diametro}C`,                  // Variante ZR con C
+            `${ancho}ZRF${diametro}`                   // Variante ZRF
+        ];
     }
+
+    // Si la medida ya contiene "/", "R" o "Z", devolverla directamente
+    if (medida.includes("/") || medida.includes("R") || medida.includes("Z")) {
+        return [medida];
+    }
+
+    // Por defecto, devolver la medida como está
     return [medida];
 }
 
