@@ -132,28 +132,28 @@ a {
 }
 
 a:hover {
-    top: 20px;
-    right: 20px;
+    right: 10px;
     color: #ff0000;
 }
 
 #scrollButton {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 20px; /* Lo coloca 20px desde la parte inferior */
+    right: 20px;  /* Lo coloca 20px desde la parte derecha */
     padding: auto;
-    background-color: #ff0000;
+    background-color: red; /* Mismo color que el botón "Buscar" */
     color: white;
+    font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
     opacity: 0.9;
-    z-index: 1;
-
 }
 
 #scrollButton:hover {
-    background-color: #ff0000;
+    background-color: red;
     opacity: 1;
 }
