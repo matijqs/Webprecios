@@ -7,6 +7,29 @@ document.getElementById('medidaInput').addEventListener('keydown', function(even
     }
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    const button = document.getElementById("scrollButton");
+
+    function updateButtonText() {
+        if (window.scrollY > 100) {
+            button.textContent = "Ir al inicio";
+        } else {
+            button.textContent = "Ir al final";
+        }
+    }
+
+    button.addEventListener("click", function () {
+        if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 10) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        }
+    });
+
+    window.addEventListener("scroll", updateButtonText);
+    updateButtonText(); // Inicializa el texto correctamente
+});
+
 function realizarBusqueda() {
     const medidaBuscada = document.getElementById('medidaInput').value.trim();
 
@@ -159,6 +182,6 @@ function GenerarVariantesMedida(medida) {
 
         resultadosTexto = resultadosTexto.trim();
 
-        navigator.clipboard.writeText(resultadosTexto);   
-
+        navigator.clipboard.writeText(resultadosTexto);
+    
 });
