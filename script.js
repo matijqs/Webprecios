@@ -20,9 +20,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     button.addEventListener("click", function () {
         if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 10) {
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            window.scrollTo({ top: 0, behavior: "instant" });
         } else {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+            window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
         }
     });
 
