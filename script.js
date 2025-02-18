@@ -87,13 +87,20 @@ function cargarArchivo(medidaBuscada) {
                             Modelo: ${modelo}<br>
                             Precio unidad: $${precioUnidadFormateado}<br>
                             Precio por juego: $${precioJuegoFormateado}`;
+                            if (precioJuego < precioUnidad*2)
+                                resultadoTexto = `
+                                Medida: ${medida}<br>
+                                Marca: ${marca}<br>
+                                Modelo: ${modelo}<br>
+                                Precio unidad: $${precioUnidadFormateado}<br>
+                                Precio por el par: $${precioJuegoFormateado}`;                                             
                     } else if (precioJuego) {
                         resultadoTexto = `
                             Medida: ${medida}<br>
                             Marca: ${marca}<br>
                             Modelo: ${modelo}<br>
                             Precio unidad: NO se vende por unidad<br>
-                            Precio por juego: $${precioJuegoFormateado}`;
+                            Precio por juego: $${precioJuegoFormateado}`;                    
                     } else if (precioUnidad) {
                         resultadoTexto = `
                             Medida: ${medida}<br>
