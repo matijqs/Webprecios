@@ -86,6 +86,11 @@ h1 {
     border-color: #ff0000;
     outline: none;
 }
+#copySelectedButton,#copySelectedButton:active{
+    background-color: #ff0000;
+    border-color: #ff0000;
+    outline: none;
+}
 
 .alert {
     border-radius: 8px;
@@ -186,5 +191,8 @@ a:hover {
     text-decoration: underline; /* Subrayado al pasar el ratón */
     color: #007bff; /* Color al pasar el ratón */
 }
+
+
+
 
 

@@ -1,43 +1,16 @@
 document.getElementById('searchButton').addEventListener('click', realizarBusqueda);
 document.getElementById('medidaInput').addEventListener('keydown', function(event) {
-    
-    if (event.key === "Enter") {       
-
+    if (event.key === "Enter") {
         realizarBusqueda();
     }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-    const button = document.getElementById("scrollButton");
-
-    function updateButtonText() {
-        if (window.scrollY > 100) {
-            button.textContent = "Ir al inicio";
-        } else {
-            button.textContent = "Ir al final";
-        }
-    }
-
-    button.addEventListener("click", function () {
-        if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 10) {
-            window.scrollTo({ top: 0, behavior: "instant" });
-        } else {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
-        }
-    });
-
-    window.addEventListener("scroll", updateButtonText);
-    updateButtonText(); // Inicializa el texto correctamente
-});
-
 function realizarBusqueda() {
     const medidaBuscada = document.getElementById('medidaInput').value.trim();
-
     if (!medidaBuscada) {
         alert("Por favor, ingresa una medida válida.");
         return;
     }
-
     cargarArchivo(medidaBuscada);
 }
 
@@ -55,140 +28,155 @@ function cargarArchivo(medidaBuscada) {
                 variantes.some(vari => row["MEDIDA"] && row["MEDIDA"].toString().toUpperCase().includes(vari.toUpperCase()))
             );
 
-            const resultadosDiv = document.getElementById('resultados');
-            resultadosDiv.innerHTML = '';
-
-            const encabezado = document.createElement('h3');
-            encabezado.textContent = "Tenemos lo siguiente:";
-            resultadosDiv.appendChild(encabezado);
-
-            if (resultados.length > 0) {
-                resultados.forEach(fila => {
-                    const medida = fila["MEDIDA"] || '';
-                    const marca = fila["MARCA"] || '';
-                    const modelo = fila["MODELO"] || '';
-                    const precioUnidad = fila["UNIDAD"] || '';
-                    const precioJuego = fila["X 4"] || '';
-
-                    function formatearPrecio(precio) {
-                        if (!precio) return '';
-                        return precio.toLocaleString('es-ES');
-                    }
-
-                    const precioUnidadFormateado = formatearPrecio(precioUnidad);
-                    const precioJuegoFormateado = formatearPrecio(precioJuego);
-
-                    let resultadoTexto = '';
-
-                    if (precioJuego && precioUnidad) {
-                        resultadoTexto = `
-                            Medida: ${medida}<br>
-                            Marca: ${marca}<br>
-                            Modelo: ${modelo}<br>
-                            Precio unidad: $${precioUnidadFormateado}<br>
-                            Precio por juego: $${precioJuegoFormateado}`;
-                            if (precioJuego < precioUnidad*2)
-                                resultadoTexto = `
-                                Medida: ${medida}<br>
-                                Marca: ${marca}<br>
-                                Modelo: ${modelo}<br>
-                                Precio unidad: $${precioUnidadFormateado}<br>
-                                Precio por el par: $${precioJuegoFormateado}`;                                             
-                    } else if (precioJuego) {
-                        resultadoTexto = `
-                            Medida: ${medida}<br>
-                            Marca: ${marca}<br>
-                            Modelo: ${modelo}<br>
-                            Precio unidad: NO se vende por unidad<br>
-                            Precio por juego: $${precioJuegoFormateado}`;                    
-                    } else if (precioUnidad) {
-                        resultadoTexto = `
-                            Medida: ${medida}<br>
-                            Marca: ${marca}<br>
-                            Modelo: ${modelo}<br>
-                            Precio unidad: $${precioUnidadFormateado}<br>
-                            Precio por juego: NO se hace precio por juego`;
-                    }
-
-                    const resultadoElemento = document.createElement('div');
-                    resultadoElemento.classList.add('alert', 'alert-info');
-                    resultadoElemento.innerHTML = resultadoTexto;
-                    resultadosDiv.appendChild(resultadoElemento);
-                });
-
-                document.getElementById('copyButton').style.display = 'block';
-            } else {
-                const resultadoElemento = document.createElement('p');
-                resultadoElemento.classList.add('alert', 'alert-warning');
-                resultadoElemento.textContent = `No se encontraron neumáticos que contengan la medida "${medidaBuscada}".`;
-                resultadosDiv.appendChild(resultadoElemento);
-
-                document.getElementById('copyButton').style.display = 'none';
-            }
+            mostrarResultados(resultados, medidaBuscada);
         })
         .catch(error => console.error('Error al cargar el archivo:', error));
 }
 
 function GenerarVariantesMedida(medida) {
-    // Asegurarnos de que la medida se trate como texto
     medida = medida.toString().trim();
-
-    // Si la medida tiene 7 caracteres, convertirla a formato "XXX/XXRXX" y añadir variantes
     if (medida.length === 7) {
-        const ancho = medida.substring(0, 3);        // Primeros 3 caracteres
-        const perfil = medida.substring(3, 5);       // Caracteres del 3 al 5 (2 dígitos)
-        const diametro = medida.substring(5);        // Últimos 2 caracteres
-
+        const ancho = medida.substring(0, 3);
+        const perfil = medida.substring(3, 5);
+        const diametro = medida.substring(5);
         return [
-            `${ancho}/${perfil}R${diametro}`,           // Formato estándar
-            `${ancho}/${perfil}ZR${diametro}`,          // Variante ZR
-            `${ancho}/${perfil}ZRZ${diametro}`,         // Variante ZRZ
-            `${ancho}/${perfil}RZR${diametro}`,         // Variante RZR
-            `${ancho}/${perfil}R${diametro}C`,          // Variante con C
-            `${ancho}/${perfil}ZR${diametro}C`,         // Variante ZR con C
-            `${ancho}/${perfil}ZRF${diametro}`,         // Variante ZRF
-            `${ancho}/${perfil}ZRXL${diametro}`,        // Variante ZRXL
-            `${ancho}/${perfil}ZRF${diametro}C`         // Variante ZRF con C
+            `${ancho}/${perfil}R${diametro}`, `${ancho}/${perfil}ZR${diametro}`, 
+            `${ancho}/${perfil}ZRZ${diametro}`, `${ancho}/${perfil}RZR${diametro}`,
+            `${ancho}/${perfil}R${diametro}C`, `${ancho}/${perfil}ZR${diametro}C`,
+            `${ancho}/${perfil}ZRF${diametro}`, `${ancho}/${perfil}ZRXL${diametro}`,
+            `${ancho}/${perfil}ZRF${diametro}C`
         ];
     }
-
-    // Si la medida tiene 5 caracteres, convertirla a formato "XXXRXX" y añadir variantes
     if (medida.length === 5) {
-        const ancho = medida.substring(0, 3);        // Primeros 3 caracteres
-        const diametro = medida.substring(3);        // Últimos 2 caracteres
-
+        const ancho = medida.substring(0, 3);
+        const diametro = medida.substring(3);
         return [
-            `${ancho}R${diametro}`,                    // Formato estándar
-            `${ancho}R${diametro}C`,                   // Variante con C
-            `${ancho}ZR${diametro}`,                   // Variante ZR
-            `${ancho}ZR${diametro}C`,                  // Variante ZR con C
-            `${ancho}ZRF${diametro}`                   // Variante ZRF
+            `${ancho}R${diametro}`, `${ancho}R${diametro}C`,
+            `${ancho}ZR${diametro}`, `${ancho}ZR${diametro}C`,
+            `${ancho}ZRF${diametro}`
         ];
     }
-
-    // Si la medida ya contiene "/", "R" o "Z", devolverla directamente
     if (medida.includes("/") || medida.includes("R") || medida.includes("Z")) {
         return [medida];
     }
-
-    // Por defecto, devolver la medida como está
     return [medida];
 }
 
-    document.getElementById('copyButton').addEventListener('click', function() {
-        const resultadosDiv = document.getElementById('resultados');
-        let resultadosTexto = 'Tenemos lo siguiente:\n\n';
+function mostrarResultados(resultados, medidaBuscada) {
+    const resultadosDiv = document.getElementById('resultados');
+    resultadosDiv.innerHTML = '';
 
-        const alertElements = resultadosDiv.getElementsByClassName('alert');
+    const encabezado = document.createElement('h3');
+    encabezado.textContent = "Tenemos lo siguiente:";
+    resultadosDiv.appendChild(encabezado);
 
-        for (let i = 0; i < alertElements.length; i++) {
-            const alertElement = alertElements[i];
-            const lines = alertElement.innerText.split('\n').map(line => line.trim()).filter(line => line !== '');
+    if (resultados.length > 0) {
+        resultados.forEach(fila => {
+            const medida = fila["MEDIDA"] || '';
+            const marca = fila["MARCA"] || '';
+            const modelo = fila["MODELO"] || '';
+            const precioUnidad = fila["UNIDAD"] || '';
+            const precioJuego = fila["X 4"] || '';
+
+            function formatearPrecio(precio) {
+                if (!precio) return '';
+                return precio.toLocaleString('es-ES');
+            }
+
+            const precioUnidadFormateado = formatearPrecio(precioUnidad);
+            const precioJuegoFormateado = formatearPrecio(precioJuego);
+
+            let resultadoTexto = '';
+
+            if (precioJuego && precioUnidad) {
+                resultadoTexto = `
+                    Medida: ${medida}<br>
+                    Marca: ${marca}<br>
+                    Modelo: ${modelo}<br>
+                    Precio unidad: $${precioUnidadFormateado}<br>
+                    Precio por juego: $${precioJuegoFormateado}`;
+                if (precioJuego < precioUnidad * 2)
+                    resultadoTexto = `
+                    Medida: ${medida}<br>
+                    Marca: ${marca}<br>
+                    Modelo: ${modelo}<br>
+                    Precio unidad: $${precioUnidadFormateado}<br>
+                    Precio por el par: $${precioJuegoFormateado}`;
+            } else if (precioJuego) {
+                resultadoTexto = `
+                    Medida: ${medida}<br>
+                    Marca: ${marca}<br>
+                    Modelo: ${modelo}<br>
+                    Precio unidad: NO se vende por unidad<br>
+                    Precio por juego: $${precioJuegoFormateado}`;
+            } else if (precioUnidad) {
+                resultadoTexto = `
+                    Medida: ${medida}<br>
+                    Marca: ${marca}<br>
+                    Modelo: ${modelo}<br>
+                    Precio unidad: $${precioUnidadFormateado}<br>
+                    Precio por juego: NO se hace precio por juego`;
+            }
+
+            const resultadoElemento = document.createElement('div');
+            resultadoElemento.classList.add('alert', 'alert-info');
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.classList.add('resultado-checkbox');
+            checkbox.style.marginRight = '10px';
+
+            resultadoElemento.appendChild(checkbox);
+            resultadoElemento.innerHTML += resultadoTexto;
+            resultadosDiv.appendChild(resultadoElemento);
+        });
+
+        document.getElementById('copyButton').style.display = 'block';
+        document.getElementById('copySelectedButton').style.display = 'block';
+    } else {
+        const resultadoElemento = document.createElement('p');
+        resultadoElemento.classList.add('alert', 'alert-warning');
+        resultadoElemento.textContent = `No se encontraron neumáticos que contengan la medida "${medidaBuscada}".`;
+        resultadosDiv.appendChild(resultadoElemento);
+
+        document.getElementById('copyButton').style.display = 'none';
+        document.getElementById('copySelectedButton').style.display = 'none';
+    }
+}
+
+// Función para copiar todos los resultados
+document.getElementById('copyButton').addEventListener('click', function() {
+    const resultadosDiv = document.getElementById('resultados');
+    let resultadosTexto = '';
+
+    resultadosDiv.querySelectorAll('.alert').forEach(alert => {
+        const lines = alert.innerText.split('\n').map(line => line.trim()).filter(line => line !== '');
+        resultadosTexto += lines.join('\n') + '\n\n';
+    });
+
+    navigator.clipboard.writeText(resultadosTexto.trim());
+});
+
+// Función para copiar solo los resultados seleccionados
+document.getElementById('copySelectedButton').addEventListener('click', function() {
+    const resultadosDiv = document.getElementById('resultados');
+    let resultadosTexto = '';
+
+    const checkboxes = resultadosDiv.querySelectorAll('.resultado-checkbox:checked');
+
+    if (checkboxes.length === 0) {
+        alert("Selecciona al menos un resultado para copiar.");
+        return;
+    }
+
+    checkboxes.forEach(checkbox => {
+        const resultadoElemento = checkbox.closest('.alert');
+        if (resultadoElemento) {
+            const lines = resultadoElemento.innerText.split('\n').map(line => line.trim()).filter(line => line !== '');
             resultadosTexto += lines.join('\n') + '\n\n';
         }
+    });
 
-        resultadosTexto = resultadosTexto.trim();
-
-        navigator.clipboard.writeText(resultadosTexto);
-    
+    resultadosTexto = resultadosTexto.trim();
+    navigator.clipboard.writeText(resultadosTexto);
 });
