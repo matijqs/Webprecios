@@ -35,6 +35,8 @@ function cargarArchivo(medidaBuscada) {
 
 function GenerarVariantesMedida(medida) {
     medida = medida.toString().trim();
+    
+    // Verificar si la medida tiene una longitud de 7 (común para medidas estándar)
     if (medida.length === 7) {
         const ancho = medida.substring(0, 3);
         const perfil = medida.substring(3, 5);
@@ -47,6 +49,8 @@ function GenerarVariantesMedida(medida) {
             `${ancho}/${perfil}ZRF${diametro}C`
         ];
     }
+
+    // Verificar si la medida tiene una longitud de 5 (puede ser común para algunos casos)
     if (medida.length === 5) {
         const ancho = medida.substring(0, 3);
         const diametro = medida.substring(3);
@@ -56,11 +60,16 @@ function GenerarVariantesMedida(medida) {
             `${ancho}ZRF${diametro}`
         ];
     }
+    
+    // Caso donde la medida incluye caracteres como "/" o "R" o "Z", que son comunes en medidas
     if (medida.includes("/") || medida.includes("R") || medida.includes("Z")) {
         return [medida];
-    }
+    }    
+
+    // Para cualquier otro formato, simplemente devolver la medida original
     return [medida];
 }
+
 
 function mostrarResultados(resultados, medidaBuscada) {
     const resultadosDiv = document.getElementById('resultados');
@@ -76,72 +85,124 @@ function mostrarResultados(resultados, medidaBuscada) {
             const marca = fila["MARCA"] || '';
             const modelo = fila["MODELO"] || '';
             const precioUnidad = fila["UNIDAD"] || '';
-            const precioJuego = fila["X 4"] || '';
-
+            const precioX2 = fila["X2"] || '';
+            const precioX4 = fila["X4"] || '';
+    
             function formatearPrecio(precio) {
                 if (!precio) return '';
                 return precio.toLocaleString('es-ES');
             }
-
+    
             const precioUnidadFormateado = formatearPrecio(precioUnidad);
-            const precioJuegoFormateado = formatearPrecio(precioJuego);
-
+            const precioX2Formateado = formatearPrecio(precioX2);
+            const precioX4Formateado = formatearPrecio(precioX4);
+    
             let resultadoTexto = '';
-
-            if (precioJuego && precioUnidad) {
+    
+            // Caso 1: Los tres precios están disponibles
+            if (precioUnidad && precioX2 && precioX4) {
                 resultadoTexto = `
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por juego: $${precioJuegoFormateado}`;
-                if (precioJuego < precioUnidad * 2)
-                    resultadoTexto = `
+                    Precio por par (X2): $${precioX2Formateado}<br>
+                    Precio por juego (X4): $${precioX4Formateado}`;
+            }
+            // Caso 2: Precio por unidad y precio por juego (X4) están disponibles
+            else if (precioUnidad && !precioX2 && precioX4) {
+                resultadoTexto = `
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por el par: $${precioJuegoFormateado}`;
-            } else if (precioJuego) {
+                    Precio por par (X2): NO se hace precio por par<br>
+                    Precio por juego (X4): $${precioX4Formateado}`;
+            }
+            // Caso 3: Precio por unidad y precio por par (X2) están disponibles
+            else if (precioUnidad && precioX2 && !precioX4) {
+                resultadoTexto = `
+                    Medida: ${medida}<br>
+                    Marca: ${marca}<br>
+                    Modelo: ${modelo}<br>
+                    Precio unidad: $${precioUnidadFormateado}<br>
+                    Precio por par (X2): $${precioX2Formateado}<br>
+                    Precio por juego (X4): NO se hace precio por juego`;
+            }
+            // Caso 4: Solo precio por par (X2) y precio por juego (X4) está disponible
+            else if (precioX2 && precioX4) {
                 resultadoTexto = `
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: NO se vende por unidad<br>
-                    Precio por juego: $${precioJuegoFormateado}`;
-            } else if (precioUnidad) {
+                    Precio por par (X2): $${precioX2Formateado}<br>
+                    Precio por juego (X4): $${precioX4Formateado}`;
+            }
+            // Caso 4: Solo precio por juego (X4) está disponible
+            else if (!precioUnidad && !precioX2 && precioX4) {
+                resultadoTexto = `
+                    Medida: ${medida}<br>
+                    Marca: ${marca}<br>
+                    Modelo: ${modelo}<br>
+                    Precio unidad: NO se vende por unidad<br>
+                    Precio por par (X2): NO se hace precio por par<br>
+                    Precio por juego (X4): $${precioX4Formateado}`;
+            }
+            // Caso 5: Solo precio por par (X2) está disponible
+            else if (!precioUnidad && precioX2 && !precioX4) {
+                resultadoTexto = `
+                    Medida: ${medida}<br>
+                    Marca: ${marca}<br>
+                    Modelo: ${modelo}<br>
+                    Precio unidad: NO se vende por unidad<br>
+                    Precio por par (X2): $${precioX2Formateado}<br>
+                    Precio por juego (X4): NO se hace precio por juego`;
+            }
+            // Caso 6: Solo precio por unidad está disponible
+            else if (precioUnidad && !precioX2 && !precioX4) {
                 resultadoTexto = `
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por juego: NO se hace precio por juego`;
+                    Precio por par (X2): NO se hace precio por par<br>
+                    Precio por juego (X4): NO se hace precio por juego`;
             }
-
+    
+            // Crear el elemento del resultado
             const resultadoElemento = document.createElement('div');
             resultadoElemento.classList.add('alert', 'alert-info');
-
+    
+            // Crear el checkbox
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.classList.add('resultado-checkbox');
             checkbox.style.marginRight = '10px';
-
+    
+            // Añadir el checkbox al resultado
             resultadoElemento.appendChild(checkbox);
             resultadoElemento.innerHTML += resultadoTexto;
+    
+            // Añadir el resultado a la vista
             resultadosDiv.appendChild(resultadoElemento);
         });
-
+    
+        // Mostrar botones si hay resultados
         document.getElementById('copyButton').style.display = 'block';
         document.getElementById('copySelectedButton').style.display = 'block';
     } else {
+        // Mostrar mensaje si no hay resultados
         const resultadoElemento = document.createElement('p');
         resultadoElemento.classList.add('alert', 'alert-warning');
         resultadoElemento.textContent = `No se encontraron neumáticos que contengan la medida "${medidaBuscada}".`;
         resultadosDiv.appendChild(resultadoElemento);
-
+    
+        // Ocultar botones si no hay resultados
         document.getElementById('copyButton').style.display = 'none';
         document.getElementById('copySelectedButton').style.display = 'none';
     }
+                
 }
 
 // Función para copiar todos los resultados
