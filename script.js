@@ -116,7 +116,6 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por par (X2): NO se hace precio por par<br>
                     Precio por juego (X4): $${precioX4Formateado}`;
             }
             // Caso 3: Precio por unidad y precio por par (X2) están disponibles
@@ -126,8 +125,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por par (X2): $${precioX2Formateado}<br>
-                    Precio por juego (X4): NO se hace precio por juego`;
+                    Precio por par (X2): $${precioX2Formateado}<br>`;
             }
             // Caso 4: Solo precio por par (X2) y precio por juego (X4) está disponible
             else if (precioX2 && precioX4) {
@@ -135,7 +133,6 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio unidad: NO se vende por unidad<br>
                     Precio por par (X2): $${precioX2Formateado}<br>
                     Precio por juego (X4): $${precioX4Formateado}`;
             }
@@ -145,8 +142,6 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio unidad: NO se vende por unidad<br>
-                    Precio por par (X2): NO se hace precio por par<br>
                     Precio por juego (X4): $${precioX4Formateado}`;
             }
             // Caso 5: Solo precio por par (X2) está disponible
@@ -155,9 +150,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio unidad: NO se vende por unidad<br>
-                    Precio por par (X2): $${precioX2Formateado}<br>
-                    Precio por juego (X4): NO se hace precio por juego`;
+                    Precio por par (X2): $${precioX2Formateado}<br>`;
             }
             // Caso 6: Solo precio por unidad está disponible
             else if (precioUnidad && !precioX2 && !precioX4) {
@@ -165,9 +158,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por par (X2): NO se hace precio por par<br>
-                    Precio por juego (X4): NO se hace precio por juego`;
+                    Precio unidad: $${precioUnidadFormateado}<br>`;
             }
     
             // Crear el elemento del resultado
