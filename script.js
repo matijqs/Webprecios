@@ -87,6 +87,7 @@ function mostrarResultados(resultados, medidaBuscada) {
             const precioUnidad = fila["UNIDAD"] || '';
             const precioX2 = fila["X2"] || '';
             const precioX4 = fila["X4"] || '';
+            const imagen = fila["LINK"] || '';
     
             function formatearPrecio(precio) {
                 if (!precio) return '';
@@ -116,7 +117,8 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por juego (X4): $${precioX4Formateado}`;
+                    Precio por juego (X4): $${precioX4Formateado}<br>
+                    Imagen: <a href="${imagen}" target="_blank">Ver imagen en Imgur</a>`;
             }
             // Caso 3: Precio por unidad y precio por par (X2) están disponibles
             else if (precioUnidad && precioX2 && !precioX4) {
