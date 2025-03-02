@@ -5,13 +5,14 @@ document.getElementById('medidaInput').addEventListener('keydown', function(even
     }
 });
 
-document.getElementById("scrollButton").addEventListener("click", function () {
-    if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 10) {
+const scrollButton = document.getElementById("scrollButton");
+scrollButton.addEventListener("click", function () {
+    if (window.scrollY >= document.body.scrollHeight - window.innerHeight - 10) {
         window.scrollTo({ top: 0, behavior: "instant" });
-        scrollButton.innerHTML="Ir al final"
+        scrollButton.innerHTML = "Ir al final";
     } else {
         window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
-        scrollButton.innerHTML="Ir al inicio"
+        scrollButton.innerHTML = "Ir al inicio";
     }
 });
 
