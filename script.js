@@ -5,6 +5,14 @@ document.getElementById('medidaInput').addEventListener('keydown', function(even
     }
 });
 
+document.getElementById("scrollButton").addEventListener("click", function () {
+    if (window.scrollY + window.innerHeight >= document.body.scrollHeight - 10) {
+        window.scrollTo({ top: 0, behavior: "instant" });
+    } else {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
+    }
+});
+
 function realizarBusqueda() {
     const medidaBuscada = document.getElementById('medidaInput').value.trim();
     if (!medidaBuscada) {
@@ -87,18 +95,19 @@ function mostrarResultados(resultados, medidaBuscada) {
             const precioUnidad = fila["UNIDAD"] || '';
             const precioX2 = fila["X2"] || '';
             const precioX4 = fila["X4"] || '';
-    
+            const enlaceImagen = fila["LINK"] || 'No disponible';  // Aquí obtenemos el enlace de la imagen
+
             function formatearPrecio(precio) {
                 if (!precio) return '';
                 return precio.toLocaleString('es-ES');
             }
-    
+
             const precioUnidadFormateado = formatearPrecio(precioUnidad);
             const precioX2Formateado = formatearPrecio(precioX2);
             const precioX4Formateado = formatearPrecio(precioX4);
-    
+
             let resultadoTexto = '';
-    
+
             // Caso 1: Los tres precios están disponibles
             if (precioUnidad && precioX2 && precioX4) {
                 resultadoTexto = `
@@ -107,19 +116,19 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
                     Precio por par (X2): $${precioX2Formateado}<br>
-                    Precio por juego (X4): $${precioX4Formateado}`;
+                    Precio por juego (X4): $${precioX4Formateado}<br>
+                    Imagen: ${enlaceImagen}`;  // Agregar imagen
             }
             // Caso 2: Precio por unidad y precio por juego (X4) están disponibles
-            else if (precioUnidad && !precioX2 && precioX4) {                
+            else if (precioUnidad && !precioX2 && precioX4) {
                 resultadoTexto = `
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por juego (X4): $${precioX4Formateado}`;
+                    Precio por juego (X4): $${precioX4Formateado}<br>
+                    Imagen: ${enlaceImagen}`;  // Agregar imagen
             }
-            
-            
             // Caso 3: Precio por unidad y precio por par (X2) están disponibles
             else if (precioUnidad && precioX2 && !precioX4) {
                 resultadoTexto = `
@@ -127,7 +136,8 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por par (X2): $${precioX2Formateado}<br>`;
+                    Precio por par (X2): $${precioX2Formateado}<br>
+                    Imagen: ${enlaceImagen}`;  // Agregar imagen
             }
             // Caso 4: Solo precio por par (X2) y precio por juego (X4) está disponible
             else if (precioX2 && precioX4) {
@@ -136,51 +146,55 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio por par (X2): $${precioX2Formateado}<br>
-                    Precio por juego (X4): $${precioX4Formateado}`;
+                    Precio por juego (X4): $${precioX4Formateado}<br>
+                    Imagen: ${enlaceImagen}`;  // Agregar imagen
             }
-            // Caso 4: Solo precio por juego (X4) está disponible
+            // Caso 5: Solo precio por juego (X4) está disponible
             else if (!precioUnidad && !precioX2 && precioX4) {
                 resultadoTexto = `
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio por juego (X4): $${precioX4Formateado}`;
+                    Precio por juego (X4): $${precioX4Formateado}<br>
+                    Imagen: ${enlaceImagen}`;  // Agregar imagen
             }
-            // Caso 5: Solo precio por par (X2) está disponible
+            // Caso 6: Solo precio por par (X2) está disponible
             else if (!precioUnidad && precioX2 && !precioX4) {
                 resultadoTexto = `
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio por par (X2): $${precioX2Formateado}<br>`;
+                    Precio por par (X2): $${precioX2Formateado}<br>
+                    Imagen: ${enlaceImagen}`;  // Agregar imagen
             }
-            // Caso 6: Solo precio por unidad está disponible
+            // Caso 7: Solo precio por unidad está disponible
             else if (precioUnidad && !precioX2 && !precioX4) {
                 resultadoTexto = `
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio unidad: $${precioUnidadFormateado}<br>`;
+                    Precio unidad: $${precioUnidadFormateado}<br>
+                    Imagen: ${enlaceImagen}`;  // Agregar imagen
             }
-    
+
             // Crear el elemento del resultado
             const resultadoElemento = document.createElement('div');
             resultadoElemento.classList.add('alert', 'alert-info');
-    
+
             // Crear el checkbox
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.classList.add('resultado-checkbox');
             checkbox.style.marginRight = '10px';
-    
+
             // Añadir el checkbox al resultado
             resultadoElemento.appendChild(checkbox);
             resultadoElemento.innerHTML += resultadoTexto;
-    
+
             // Añadir el resultado a la vista
             resultadosDiv.appendChild(resultadoElemento);
         });
-    
+
         // Mostrar botones si hay resultados
         document.getElementById('copyButton').style.display = 'block';
         document.getElementById('copySelectedButton').style.display = 'block';
@@ -190,12 +204,11 @@ function mostrarResultados(resultados, medidaBuscada) {
         resultadoElemento.classList.add('alert', 'alert-warning');
         resultadoElemento.textContent = `No se encontraron neumáticos que contengan la medida "${medidaBuscada}".`;
         resultadosDiv.appendChild(resultadoElemento);
-    
+
         // Ocultar botones si no hay resultados
         document.getElementById('copyButton').style.display = 'none';
         document.getElementById('copySelectedButton').style.display = 'none';
     }
-                
 }
 
 // Función para copiar todos los resultados
@@ -247,3 +260,4 @@ document.getElementById('copySelectedButton').addEventListener('click', function
     resultadosTexto = resultadosTexto.trim();
     navigator.clipboard.writeText(resultadosTexto);
 });
+
