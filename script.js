@@ -98,7 +98,6 @@ function mostrarResultados(resultados, medidaBuscada) {
             const precioUnidad = fila["UNIDAD"] || '';
             const precioX2 = fila["X2"] || '';
             const precioX4 = fila["X4"] || '';
-            const enlaceImagen = fila["LINK"] || 'No disponible';  // Aquí obtenemos el enlace de la imagen
 
             function formatearPrecio(precio) {
                 if (!precio) return '';
@@ -119,8 +118,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
                     Precio por par (X2): $${precioX2Formateado}<br>
-                    Precio por juego (X4): $${precioX4Formateado}<br>
-                    Imagen: ${enlaceImagen}`;  // Agregar imagen
+                    Precio por juego (X4): $${precioX4Formateado}<br>`;  
             }
             // Caso 2: Precio por unidad y precio por juego (X4) están disponibles
             else if (precioUnidad && !precioX2 && precioX4) {
@@ -129,8 +127,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por juego (X4): $${precioX4Formateado}<br>
-                    Imagen: ${enlaceImagen}`;  // Agregar imagen
+                    Precio por juego (X4): $${precioX4Formateado}<br>`;
             }
             // Caso 3: Precio por unidad y precio por par (X2) están disponibles
             else if (precioUnidad && precioX2 && !precioX4) {
@@ -139,8 +136,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio unidad: $${precioUnidadFormateado}<br>
-                    Precio por par (X2): $${precioX2Formateado}<br>
-                    Imagen: ${enlaceImagen}`;  // Agregar imagen
+                    Precio por par (X2): $${precioX2Formateado}<br>`;
             }
             // Caso 4: Solo precio por par (X2) y precio por juego (X4) está disponible
             else if (precioX2 && precioX4) {
@@ -149,8 +145,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
                     Precio por par (X2): $${precioX2Formateado}<br>
-                    Precio por juego (X4): $${precioX4Formateado}<br>
-                    Imagen: ${enlaceImagen}`;  // Agregar imagen
+                    Precio por juego (X4): $${precioX4Formateado}<br>`;
             }
             // Caso 5: Solo precio por juego (X4) está disponible
             else if (!precioUnidad && !precioX2 && precioX4) {
@@ -158,8 +153,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio por juego (X4): $${precioX4Formateado}<br>
-                    Imagen: ${enlaceImagen}`;  // Agregar imagen
+                    Precio por juego (X4): $${precioX4Formateado}<br>`;
             }
             // Caso 6: Solo precio por par (X2) está disponible
             else if (!precioUnidad && precioX2 && !precioX4) {
@@ -167,8 +161,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio por par (X2): $${precioX2Formateado}<br>
-                    Imagen: ${enlaceImagen}`;  // Agregar imagen
+                    Precio por par (X2): $${precioX2Formateado}<br>`; 
             }
             // Caso 7: Solo precio por unidad está disponible
             else if (precioUnidad && !precioX2 && !precioX4) {
@@ -176,8 +169,7 @@ function mostrarResultados(resultados, medidaBuscada) {
                     Medida: ${medida}<br>
                     Marca: ${marca}<br>
                     Modelo: ${modelo}<br>
-                    Precio unidad: $${precioUnidadFormateado}<br>
-                    Imagen: ${enlaceImagen}`;  // Agregar imagen
+                    Precio unidad: $${precioUnidadFormateado}<br>`;  
             }
 
             // Crear el elemento del resultado
