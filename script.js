@@ -5,6 +5,12 @@ document.getElementById('medidaInput').addEventListener('keydown', function(even
     }
 });
 
+document.getElementById("cleanButton").addEventListener("click", function() {
+    let input = document.getElementById("medidaInput");
+    input.value = ""; // Limpia el input
+    input.focus();    // Hace focus en el input
+});
+
 const scrollButton = document.getElementById("scrollButton");
 scrollButton.addEventListener("click", function () {
     if (window.scrollY >= document.body.scrollHeight - window.innerHeight - 10) {
@@ -188,7 +194,12 @@ function mostrarResultados(resultados, medidaBuscada) {
 
             // Añadir el resultado a la vista
             resultadosDiv.appendChild(resultadoElemento);
+            
         });
+
+        const bajada = document.createElement('p');
+        bajada.textContent = "Todos los precios incluyen instalación, balanceo y válvulas nuevas.";
+        resultadosDiv.appendChild(bajada);
 
         // Mostrar botones si hay resultados
         document.getElementById('copyButton').style.display = 'block';
@@ -223,6 +234,10 @@ document.getElementById('copyButton').addEventListener('click', function() {
         resultadosTexto += lines.join('\n') + '\n\n';
     });
 
+    // Agregar el mensaje final
+    const bajada = "Todos los precios incluyen instalación, balanceo y válvulas nuevas.";
+    resultadosTexto += bajada;
+
     navigator.clipboard.writeText(resultadosTexto.trim());
 });
 
@@ -251,6 +266,12 @@ document.getElementById('copySelectedButton').addEventListener('click', function
             resultadosTexto += lines.join('\n') + '\n\n';
         }
     });
+
+    // Agregar el mensaje final
+    const bajada = "Todos los precios incluyen instalación, balanceo y válvulas nuevas.";
+    resultadosTexto += bajada;
+
+    navigator.clipboard.writeText(resultadosTexto.trim());
 
     resultadosTexto = resultadosTexto.trim();
     navigator.clipboard.writeText(resultadosTexto);
