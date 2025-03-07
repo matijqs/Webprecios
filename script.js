@@ -198,7 +198,7 @@ function mostrarResultados(resultados, medidaBuscada) {
         });
 
         const bajada = document.createElement('p');
-        bajada.textContent = "Todos los precios incluyen instalación, balanceo y válvulas nuevas.";
+        bajada.textContent = "Todos los precios incluyen instalación, balanceo y válvulas nuevas. No aplica para válvulas con sensor";
         resultadosDiv.appendChild(bajada);
 
         // Mostrar botones si hay resultados
@@ -268,7 +268,7 @@ document.getElementById('copySelectedButton').addEventListener('click', function
     });
 
     // Agregar el mensaje final
-    const bajada = "Todos los precios incluyen instalación, balanceo y válvulas nuevas.";
+    const bajada = "Todos los precios incluyen instalación, balanceo y válvulas nuevas. No aplica para válvulas con sensor";
     resultadosTexto += bajada;
 
     navigator.clipboard.writeText(resultadosTexto.trim());
