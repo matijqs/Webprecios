@@ -197,9 +197,13 @@ function mostrarResultados(resultados, medidaBuscada) {
             
         });
 
-        const bajada = document.createElement('p');
-        bajada.textContent = "Todos los precios incluyen instalación, balanceo y válvulas nuevas. No aplica para válvulas con sensor";
-        resultadosDiv.appendChild(bajada);
+        const bajada1 = document.createElement('p');
+        bajada1.textContent = "Todos los precios incluyen instalación, balanceo y válvulas nuevas.";
+        resultadosDiv.appendChild(bajada1);
+
+        const bajada2 = document.createElement('p');
+        bajada2.innerHTML = "<strong>*No aplica para válvulas con sensor.</strong>";
+        resultadosDiv.appendChild(bajada2);
 
         // Mostrar botones si hay resultados
         document.getElementById('copyButton').style.display = 'block';
@@ -235,8 +239,10 @@ document.getElementById('copyButton').addEventListener('click', function() {
     });
 
     // Agregar el mensaje final
-    const bajada = "Todos los precios incluyen instalación, balanceo y válvulas nuevas.";
-    resultadosTexto += bajada;
+    const bajada1 = "Todos los precios incluyen instalación, balanceo y válvulas nuevas.";
+    resultadosTexto += bajada1 + "\n" +"\n";
+    const bajada2= "*No aplica para válvulas con sensor."
+    resultadosTexto += bajada2;
 
     navigator.clipboard.writeText(resultadosTexto.trim());
 });
@@ -268,8 +274,10 @@ document.getElementById('copySelectedButton').addEventListener('click', function
     });
 
     // Agregar el mensaje final
-    const bajada = "Todos los precios incluyen instalación, balanceo y válvulas nuevas. No aplica para válvulas con sensor";
-    resultadosTexto += bajada;
+    const bajada1 = "Todos los precios incluyen instalación, balanceo y válvulas nuevas.";
+    resultadosTexto += bajada1 + "\n" +"\n";
+    const bajada2= "*No aplica para válvulas con sensor."
+    resultadosTexto += bajada2;
 
     navigator.clipboard.writeText(resultadosTexto.trim());
 
