@@ -32,7 +32,7 @@ function realizarBusqueda() {
 }
 
 function cargarArchivo(medidaBuscada) {
-    fetch('files/LISTA DE PRECIOS MARKET.xlsx')
+    fetch('files/LISTA DE PRECIOS WEB.xlsx')
         .then(response => response.arrayBuffer())
         .then(data => {
             const workbook = XLSX.read(data, { type: 'array' });
