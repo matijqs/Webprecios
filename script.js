@@ -32,7 +32,7 @@ function realizarBusqueda() {
 }
 
 function cargarArchivo(medidaBuscada) {
-    fetch('files/LISTA GENERAL SAMCOR.xlsx')
+    fetch('files/LISTA DE PRECIOS MARKET.xlsx')
         .then(response => response.arrayBuffer())
         .then(data => {
             const workbook = XLSX.read(data, { type: 'array' });
